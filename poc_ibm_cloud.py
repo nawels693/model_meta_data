@@ -297,7 +297,7 @@ metadata_model = QCMetadataModel(
     calibration_data=[calibration_data],
     circuit_metadata=circuit_metadata,
     compilation_trace=compilation_trace,
-    execution_context=execution_context,
+    execution_context=[execution_context],
     provenance_record=provenance_record,
     experiment_session=None
 )

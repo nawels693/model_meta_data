@@ -1,0 +1,27 @@
+# Dependencias para PoC de Modelo de Metadatos QC v1.1
+
+# Qiskit y computación cuántica
+qiskit>=0.45.0
+qiskit-aer>=0.13.0  # Necesario para simuladores en Qiskit 1.0+
+qiskit-machine-learning>=0.7.0
+qiskit-ibm-runtime>=0.12.0
+
+# AWS Braket (opcional, solo si se usa AWS Braket)
+amazon-braket-sdk>=1.60.0
+boto3>=1.28.0
+
+# Validación y esquemas
+jsonschema>=4.17.0
+pydantic>=2.0.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Utilidades
+python-dateutil>=2.8.2
+
+# Opcional: Visualización
+matplotlib>=3.7.0
+pylatexenc>=2.10
+

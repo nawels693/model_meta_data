@@ -1,0 +1,263 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QC Metadata Model v1.1",
+  "description": "JSON Schema para el modelo de metadatos de computación cuántica v1.1",
+  "type": "object",
+  "required": [
+    "model_version",
+    "timestamp_model_created",
+    "device_metadata",
+    "calibration_data",
+    "circuit_metadata",
+    "compilation_trace",
+    "execution_context",
+    "provenance_record"
+  ],
+  "properties": {
+    "model_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "timestamp_model_created": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "device_metadata": {
+      "type": "object",
+      "required": [
+        "device_id",
+        "provider",
+        "technology",
+        "backend_name",
+        "num_qubits",
+        "version",
+        "timestamp_metadata"
+      ],
+      "properties": {
+        "device_id": {"type": "string"},
+        "provider": {"type": "string"},
+        "technology": {"type": "string"},
+        "backend_name": {"type": "string"},
+        "num_qubits": {"type": "integer", "minimum": 1},
+        "version": {"type": "string"},
+        "timestamp_metadata": {"type": "string", "format": "date-time"},
+        "connectivity": {"type": "object"},
+        "noise_characteristics": {"type": "object"},
+        "operational_parameters": {"type": "object"}
+      }
+    },
+    "calibration_data": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "calibration_id",
+          "device_id",
+          "timestamp_captured",
+          "valid_until",
+          "calibration_method",
+          "calibration_version"
+        ],
+        "properties": {
+          "calibration_id": {"type": "string"},
+          "device_id": {"type": "string"},
+          "timestamp_captured": {"type": "string", "format": "date-time"},
+          "valid_until": {"type": "string", "format": "date-time"},
+          "calibration_method": {"type": "string"},
+          "calibration_version": {"type": "string"},
+          "qubit_properties": {"type": "object"},
+          "gate_fidelities": {"type": "object"},
+          "crosstalk_matrix": {"type": "object"},
+          "additional_metrics": {"type": "object"}
+        }
+      }
+    },
+    "circuit_metadata": {
+      "type": "object",
+      "required": [
+        "circuit_id",
+        "circuit_name",
+        "algorithm_type",
+        "num_qubits",
+        "circuit_depth",
+        "num_gates",
+        "timestamp_created"
+      ],
+      "properties": {
+        "circuit_id": {"type": "string"},
+        "circuit_name": {"type": "string"},
+        "algorithm_type": {"type": "string"},
+        "num_qubits": {"type": "integer", "minimum": 1},
+        "circuit_depth": {"type": "integer", "minimum": 0},
+        "num_gates": {"type": "integer", "minimum": 0},
+        "timestamp_created": {"type": "string", "format": "date-time"},
+        "description": {"type": "string"},
+        "author": {"type": "string"},
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "algorithm_parameters": {"type": "object"},
+        "circuit_qasm": {"type": "string"}
+      }
+    },
+    "compilation_trace": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "trace_id",
+            "circuit_id",
+            "device_id",
+            "calibration_id",
+            "timestamp_compilation",
+            "compiler_name",
+            "compiler_version",
+            "compilation_duration_ms"
+          ],
+          "properties": {
+            "trace_id": {"type": "string"},
+            "circuit_id": {"type": "string"},
+            "device_id": {"type": "string"},
+            "calibration_id": {"type": "string"},
+            "timestamp_compilation": {"type": "string", "format": "date-time"},
+            "compiler_name": {"type": "string"},
+            "compiler_version": {"type": "string"},
+            "compilation_duration_ms": {"type": "number", "minimum": 0},
+            "compilation_passes": {
+              "type": "array",
+              "items": {"type": "object"}
+            },
+            "optimization_metrics": {"type": "object"},
+            "decisions_made": {"type": "object"},
+            "final_circuit_qasm": {"type": "string"},
+            "compilation_errors": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          }
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/properties/compilation_trace/oneOf/0"
+          }
+        }
+      ]
+    },
+    "execution_context": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "execution_id",
+            "trace_id",
+            "device_id",
+            "calibration_id",
+            "timestamp_execution",
+            "timestamp_compilation",
+            "num_shots",
+            "execution_mode"
+          ],
+          "properties": {
+            "execution_id": {"type": "string"},
+            "trace_id": {"type": "string"},
+            "device_id": {"type": "string"},
+            "calibration_id": {"type": "string"},
+            "timestamp_execution": {"type": "string", "format": "date-time"},
+            "timestamp_compilation": {"type": "string", "format": "date-time"},
+            "num_shots": {"type": "integer", "minimum": 1},
+            "execution_mode": {"type": "string"},
+            "computed_from_trace": {"type": "boolean"},
+            "queue_information": {"type": "object"},
+            "environmental_context": {"type": "object"},
+            "freshness_validation": {"type": "object"},
+            "execution_parameters": {"type": "object"},
+            "results": {"type": "object"}
+          }
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/properties/execution_context/oneOf/0"
+          }
+        }
+      ]
+    },
+    "provenance_record": {
+      "type": "object",
+      "required": [
+        "provenance_id",
+        "timestamp_recorded",
+        "prov_mode"
+      ],
+      "properties": {
+        "provenance_id": {"type": "string"},
+        "timestamp_recorded": {"type": "string", "format": "date-time"},
+        "prov_mode": {"type": "string"},
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "relation_type",
+              "source_id",
+              "target_id",
+              "timestamp"
+            ],
+            "properties": {
+              "relation_type": {"type": "string"},
+              "source_id": {"type": "string"},
+              "target_id": {"type": "string"},
+              "timestamp": {"type": "string", "format": "date-time"},
+              "role": {"type": "string"}
+            }
+          }
+        },
+        "workflow_graph": {"type": "object"},
+        "quality_assessment": {"type": "object"}
+      }
+    },
+    "experiment_session": {
+      "type": "object",
+      "required": [
+        "session_id",
+        "algorithm_type",
+        "timestamp_started",
+        "circuit_id",
+        "device_id",
+        "optimizer",
+        "max_iterations",
+        "shots_default",
+        "calibration_policy"
+      ],
+      "properties": {
+        "session_id": {"type": "string"},
+        "algorithm_type": {"type": "string"},
+        "timestamp_started": {"type": "string", "format": "date-time"},
+        "circuit_id": {"type": "string"},
+        "device_id": {"type": "string"},
+        "optimizer": {"type": "string"},
+        "max_iterations": {"type": "integer", "minimum": 1},
+        "shots_default": {"type": "integer", "minimum": 1},
+        "calibration_policy": {"type": "string"},
+        "num_executions": {"type": "integer", "minimum": 0},
+        "total_shots_used": {"type": "integer", "minimum": 0},
+        "execution_ids": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "session_metrics": {"type": "object"},
+        "environmental_log": {
+          "type": "array",
+          "items": {"type": "object"}
+        },
+        "timestamp_ended": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}
+

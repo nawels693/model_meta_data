@@ -1,0 +1,252 @@
+{
+  "model_version": "1.1",
+  "timestamp_model_created": "2025-11-26T03:59:19.746938Z",
+  "device_metadata": {
+    "device_id": "qasm_simulator",
+    "provider": "Simulated Provider",
+    "technology": "simulator",
+    "backend_name": "qasm_simulator",
+    "num_qubits": 32,
+    "version": "1.0",
+    "timestamp_metadata": "2025-11-26T03:59:18.902883Z",
+    "connectivity": {
+      "topology_type": "all_to_all"
+    },
+    "noise_characteristics": {},
+    "operational_parameters": {
+      "simulator": true
+    }
+  },
+  "calibration_data": [
+    {
+      "calibration_id": "cal_sim_20251126",
+      "device_id": "qasm_simulator",
+      "timestamp_captured": "2025-11-26T03:59:18.902928Z",
+      "valid_until": "2025-11-27T03:59:18.902931+00:00Z",
+      "calibration_method": "simulator_default",
+      "calibration_version": "1.0",
+      "qubit_properties": {},
+      "gate_fidelities": {},
+      "crosstalk_matrix": {},
+      "additional_metrics": {}
+    }
+  ],
+  "circuit_metadata": {
+    "circuit_id": "circ_vqe_opt1_005919",
+    "circuit_name": "VQE H2 (Opt Lvl 1)",
+    "algorithm_type": "vqe",
+    "num_qubits": 2,
+    "circuit_depth": 7,
+    "num_gates": 7,
+    "timestamp_created": "2025-11-26T03:59:19.666039Z",
+    "description": "Experimento de tesis: Nivel de optimización 1",
+    "author": "",
+    "tags": [],
+    "algorithm_parameters": {
+      "optimization_level": 1
+    },
+    "circuit_qasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh q[0];\ncx q[0],q[1];\nry(0.5) q[0];\ncx q[0],q[1];\nry(0.3) q[1];\ncx q[1],q[0];\nry(0.2) q[0];"
+  },
+  "compilation_trace": {
+    "trace_id": "trace_opt1_005919",
+    "circuit_id": "circ_vqe_opt1_005919",
+    "device_id": "qasm_simulator",
+    "calibration_id": "cal_sim_20251126",
+    "timestamp_compilation": "2025-11-26T03:59:19.741777+00:00Z",
+    "compiler_name": "qiskit",
+    "compiler_version": "1.0",
+    "compilation_duration_ms": 75.11800000000001,
+    "compilation_passes": [
+      {
+        "pass_name": "Unroll3qOrMore",
+        "pass_order": 1,
+        "status": "completed",
+        "duration_ms": 10.015733333333335,
+        "parameters": {
+          "basis_gates": [
+            "u",
+            "cx"
+          ],
+          "target_basis": "universal"
+        },
+        "circuit_state_after_pass": {
+          "num_gates": 7,
+          "circuit_depth": 7,
+          "estimated_error": 0.1
+        }
+      },
+      {
+        "pass_name": "TrivialLayout",
+        "pass_order": 2,
+        "status": "completed",
+        "duration_ms": 6.677155555555557,
+        "parameters": {
+          "method": "trivial",
+          "coupling_map": null
+        },
+        "circuit_state_after_pass": {
+          "num_gates": 6,
+          "circuit_depth": 7,
+          "estimated_error": 0.1
+        }
+      },
+      {
+        "pass_name": "FullAncillaAllocation",
+        "pass_order": 3,
+        "status": "completed",
+        "duration_ms": 4.173222222222223,
+        "parameters": {
+          "ancilla_qubits": []
+        },
+        "circuit_state_after_pass": {
+          "num_gates": 6,
+          "circuit_depth": 7,
+          "estimated_error": 0.1
+        }
+      },
+      {
+        "pass_name": "EnlargeWithAncilla",
+        "pass_order": 4,
+        "status": "completed",
+        "duration_ms": 4.173222222222223,
+        "parameters": {},
+        "circuit_state_after_pass": {
+          "num_gates": 6,
+          "circuit_depth": 7,
+          "estimated_error": 0.1
+        }
+      },
+      {
+        "pass_name": "RemoveResetInZeroState",
+        "pass_order": 5,
+        "status": "completed",
+        "duration_ms": 5.007866666666668,
+        "parameters": {},
+        "circuit_state_after_pass": {
+          "num_gates": 5,
+          "circuit_depth": 6,
+          "estimated_error": 0.09
+        }
+      },
+      {
+        "pass_name": "ApplyLayout",
+        "pass_order": 6,
+        "status": "completed",
+        "duration_ms": 8.346444444444446,
+        "parameters": {
+          "layout_method": "trivial"
+        },
+        "circuit_state_after_pass": {
+          "num_gates": 5,
+          "circuit_depth": 6,
+          "estimated_error": 0.09
+        }
+      },
+      {
+        "pass_name": "Optimize1qGates",
+        "pass_order": 7,
+        "status": "completed",
+        "duration_ms": 12.51966666666667,
+        "parameters": {
+          "optimization_level": 3,
+          "basis_gates": [
+            "u"
+          ]
+        },
+        "circuit_state_after_pass": {
+          "num_gates": 4,
+          "circuit_depth": 4,
+          "estimated_error": 0.08
+        }
+      },
+      {
+        "pass_name": "CXDirection",
+        "pass_order": 8,
+        "status": "completed",
+        "duration_ms": 5.842511111111111,
+        "parameters": {
+          "coupling_map": null
+        },
+        "circuit_state_after_pass": {
+          "num_gates": 4,
+          "circuit_depth": 4,
+          "estimated_error": 0.08
+        }
+      },
+      {
+        "pass_name": "RemoveDiagonalGatesBeforeMeasure",
+        "pass_order": 9,
+        "status": "completed",
+        "duration_ms": 6.677155555555557,
+        "parameters": {},
+        "circuit_state_after_pass": {
+          "num_gates": 7,
+          "circuit_depth": 7,
+          "estimated_error": 0.05
+        }
+      }
+    ],
+    "optimization_metrics": {
+      "optimization_level": 1,
+      "original_depth": 7,
+      "compiled_depth": 7,
+      "depth_reduction": 0,
+      "original_gates": 7,
+      "compiled_gates": 7,
+      "estimated_final_fidelity": 0.92
+    },
+    "decisions_made": {},
+    "final_circuit_qasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\nh q[0];\ncx q[0],q[1];\nry(0.5) q[0];\ncx q[0],q[1];\nry(0.3) q[1];\ncx q[1],q[0];\nry(0.2) q[0];",
+    "compilation_errors": []
+  },
+  "execution_context": [
+    {
+      "execution_id": "exec_opt1_005919",
+      "trace_id": "trace_opt1_005919",
+      "device_id": "qasm_simulator",
+      "calibration_id": "cal_sim_20251126",
+      "timestamp_execution": "2025-11-26T03:59:19.746893+00:00Z",
+      "timestamp_compilation": "2025-11-26T03:59:19.741777+00:00Z",
+      "num_shots": 1024,
+      "execution_mode": "simulator",
+      "computed_from_trace": true,
+      "queue_information": {},
+      "environmental_context": {},
+      "freshness_validation": {},
+      "execution_parameters": {},
+      "results": {
+        "counts": {
+          "00": 380,
+          "01": 557,
+          "10": 86,
+          "11": 1
+        },
+        "shots": 1024,
+        "estimated_energy": -1.037390625,
+        "success": true,
+        "job_id": "job_sim_20251126_005919"
+      }
+    }
+  ],
+  "provenance_record": {
+    "provenance_id": "prov_opt1_005919",
+    "timestamp_recorded": "2025-11-26T03:59:19.746924Z",
+    "prov_mode": "lean",
+    "relations": [
+      {
+        "relation_type": "wasDerivedFrom",
+        "source_id": "trace_opt1_005919",
+        "target_id": "circ_vqe_opt1_005919",
+        "timestamp": "2025-11-26T03:59:19.746932Z"
+      },
+      {
+        "relation_type": "wasGeneratedBy",
+        "source_id": "exec_opt1_005919",
+        "target_id": "trace_opt1_005919",
+        "timestamp": "2025-11-26T03:59:19.746936Z"
+      }
+    ],
+    "workflow_graph": {},
+    "quality_assessment": {}
+  }
+}

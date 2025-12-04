@@ -60,7 +60,19 @@ Se han resuelto varias brechas ("GAPs") identificadas durante el desarrollo:
 3.  **[GAP-3] Detalle de Compilación:** Se implementó `extract_compilation_passes` para desglosar la "caja negra" de la transpilación en pasos auditables.
 4.  **Compatibilidad Qiskit 1.x:** Se actualizó todo el código para soportar las nuevas primitivas `SamplerV2` y el manejo de sesiones de IBM Runtime, manteniendo retrocompatibilidad con `qiskit-aer`.
 
-## 6. Próximos Pasos Sugeridos para Tesis
+## 6. Componentes Auxiliares: Implementación vs. Diagrama
+
+**Nota importante:** Los componentes auxiliares del diagrama (`ProvenanceRelation`, `CompilationPass`) están implementados en el código, pero **no como clases separadas**, sino como **estructuras de datos anidadas** (diccionarios dentro de listas):
+
+*   **`ProvenanceRelation`:** Implementado como `Dict` dentro de `ProvenanceRecordLean.relations: List[Dict[str, Any]]`. Se crea mediante el método `add_relation()`.
+*   **`CompilationPass`:** Implementado como `Dict` dentro de `CompilationTrace.compilation_passes: List[Dict[str, Any]]`. Se genera mediante la función `extract_compilation_passes()` en `helpers.py`.
+*   **`ProvenanceRecordLean` → `provenance_record`:** Mapeo directo. La clase `ProvenanceRecordLean` se asigna al atributo `provenance_record` en `QCMetadataModel`.
+
+**Razón de diseño:** Esta implementación permite serialización JSON directa y mayor flexibilidad sin overhead de clases adicionales. El modelo conceptual del diagrama sigue siendo válido.
+
+Ver detalles completos en `COMPONENTES_AUXILIARES_CLARIFICACION.md`.
+
+## 7. Próximos Pasos Sugeridos para Tesis
 1.  Analizar los datos generados en `outputs/thesis_experiments/optimization_analysis.csv`.
 2.  Realizar un experimento de comparación "Simulador vs. Hardware Real" (usando `poc_ibm_cloud.py`).
 3.  Redactar el capítulo de validación utilizando los gráficos derivados de estos experimentos.

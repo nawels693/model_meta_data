@@ -1,0 +1,94 @@
+# DOCUMENTACIÓN TÉCNICA: CONEXIÓN QC (SPINQ)
+# Fuente: Documentación tutorial conexion qc[1].pdf
+
+## 1. PREPARACIÓN DEL ENTORNO (ANACONDA)
+# Contexto: Configuración inicial en sistema operativo Windows.
+
+### Paso 1.1: Creación del Entorno Virtual
+Se utiliza la terminal de Anaconda (Anaconda Powershell Prompt) para aislar las dependencias del proyecto.
+
+**Comando ejecutado:**
+`conda create --name nombre_entorno python=3.9`
+
+**[DESCRIPCIÓN DE IMAGEN - PÁGINA 1: LOGS DE CREACIÓN]**
+La imagen muestra la consola de comandos procesando la solicitud:
+1.  **Resolución de entorno:** Anaconda verifica los repositorios (`channels: defaults`) y recolecta metadatos (`Collecting package metadata`).
+2.  **Plan de Paquetes:** Se lista el conjunto de librerías base que serán instaladas automáticamente, incluyendo:
+    * `ca-certificates`, `openssl`
+    * `python` (versión 3.9.x)
+    * `pip`, `setuptools`, `sqlite`, `wheel`, `vs2015_runtime`
+3.  **Confirmación:** El sistema solicita al usuario confirmar con `Proceed ([y]/n)?`.
+4.  **Ejecución:** Se muestra el progreso de descarga y extracción (`Downloading and Extracting Packages`) finalizando con `Executing transaction: done`.
+
+### Paso 1.2: Activación del Entorno
+Es necesario activar el entorno antes de instalar librerías específicas.
+
+**Comando ejecutado:**
+`conda activate nombre_entorno` (o `conda activate spin` según el ejemplo visual).
+
+---
+
+## 2. INSTALACIÓN DE LIBRERÍAS
+# Contexto: Instalación del SDK de SpinQ y herramientas científicas.
+
+### Paso 2.1: Instalación vía PIP
+Se instalan las librerías `spinqit` y una versión específica de `numpy` para compatibilidad.
+
+**Comandos ejecutados:**
+1. `pip install spinqit`
+2. `pip install spinqit numpy==1.21.0`
+
+**[DESCRIPCIÓN DE IMAGEN - PÁGINA 2: LOGS DE INSTALACIÓN]**
+La captura de pantalla detalla la salida del gestor de paquetes `pip`:
+1.  **Descarga de dependencias:** Se observa la descarga ("Collecting") de múltiples librerías científicas y de soporte:
+    * `numpy`, `scipy`, `scikit-learn` (Ciencia de datos)
+    * `torch` (Machine Learning / Pytorch)
+    * `autograd` (Diferenciación automática)
+    * `matplotlib`, `networkx` (Visualización)
+    * `pycryptodome` (Criptografía)
+2.  **Verificación:** El proceso concluye listando los paquetes instalados y confirmando que los requerimientos están satisfechos (`Requirement already satisfied`) en la ruta `C:\Users\sebca\anaconda3\envs\spin\Lib\site-packages`.
+
+---
+
+## 3. CÓDIGO DEL PROGRAMA
+# Contexto: Script en Python para conectar con el computador cuántico (NMR).
+
+### Estructura del Script (`nombre_app.py` o Jupyter Notebook)
+
+```python
+# IMPORTACIÓN DE MÓDULOS
+# Se importan las herramientas necesarias del SDK spinqit
+from spinqit import get_nmr, get_compiler, Circuit, NMRConfig
+from spinqit import H, CX, Rx
+
+# 1. CONFIGURACIÓN DEL MOTOR
+# 'get_nmr()' inicializa el backend para Resonancia Magnética Nuclear
+engine = get_nmr()
+comp = get_compiler("native")
+
+# 2. DEFINICIÓN DEL CIRCUITO
+circ = Circuit()
+# Se asignan 2 qubits (Límite físico del equipo NMR usado)
+q = circ.allocateQubits(2)
+
+# Aplicación de compuertas Hadamard (H) para superposición
+circ << (H, q[0])
+circ << (H, q[1])
+
+# 3. COMPILACIÓN
+# Se compila el circuito para el backend nativo
+exe = comp.compile(circ, 0)
+
+# 4. CONFIGURACIÓN DE LA CONEXIÓN (NMRConfig)
+# Estos parámetros son específicos para el acceso remoto al hardware
+config = NMRConfig()
+config.configure_shots(1024)            # Número de repeticiones del experimento
+config.configure_ip("172.27.52.229")    # Dirección IP del equipo cuántico
+config.configure_port(8989)             # Puerto de comunicación
+config.configure_account("SpinQ001", "123456") # Autenticación (Usuario, Pass)
+config.configure_task("Test-JUT", "Test-JUT")  # Identificador de la tarea
+
+# 5. EJECUCIÓN Y SALIDA
+# Se envía la tarea al motor y se imprimen las probabilidades resultantes
+result = engine.execute(exe, config)
+print(result.probabilities)

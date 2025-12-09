@@ -1,0 +1,13 @@
+# Dependencias MÍNIMAS para SpinQ (sin conflictos)
+# Este archivo es para cuando SOLO usas SpinQ, sin Qiskit
+
+# SpinQ y sus dependencias (ya incluye numpy, scipy, matplotlib, etc.)
+spinqit>=0.2.0
+
+# Validación y esquemas (necesarios para el modelo de metadatos)
+jsonschema>=4.17.0
+pydantic>=2.0.0
+
+# Utilidades
+python-dateutil>=2.8.2
+

@@ -204,3 +204,4 @@ El método `QCMetadataModel.validate_denormalization()` verifica:
 - **Esquema:** `model/schema_qc_metadata_v1.1.json`
 - **Clarificación:** `COMPONENTES_AUXILIARES_CLARIFICACION.md`
 
+

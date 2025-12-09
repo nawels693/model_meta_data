@@ -613,6 +613,179 @@ class AWSBraketProvider:
 
 
 # ============================================================
+# SPINQ (NMR Quantum Computer)
+# ============================================================
+
+class SpinQProvider:
+    """Wrapper para SpinQ NMR Quantum Computer"""
+    
+    def __init__(self, ip: str, port: int = 8989, username: str = None, password: str = None):
+        """
+        Inicializa el proveedor de SpinQ
+        
+        Args:
+            ip: Dirección IP del equipo cuántico
+            port: Puerto de comunicación (default: 8989)
+            username: Usuario para autenticación
+            password: Contraseña para autenticación
+        """
+        self.ip = ip
+        self.port = port
+        self.username = username
+        self.password = password
+        self.engine = None
+        self.compiler = None
+        self._initialize_service()
+    
+    def _initialize_service(self):
+        """Inicializa el servicio de SpinQ"""
+        try:
+            from spinqit import get_nmr, get_compiler
+            
+            self.engine = get_nmr()
+            self.compiler = get_compiler("native")
+            print("✓ SpinQ NMR Service inicializado")
+        except ImportError:
+            raise ImportError("spinqit no está instalado. Instala con: pip install spinqit")
+        except Exception as e:
+            raise Exception(f"Error al inicializar SpinQ Service: {e}")
+    
+    def get_device_metadata(self, device_name: str = "SpinQ-NMR") -> Dict[str, Any]:
+        """
+        Obtiene metadatos del dispositivo SpinQ
+        
+        Args:
+            device_name: Nombre del dispositivo (default: SpinQ-NMR)
+        
+        Returns:
+            DeviceMetadata como diccionario
+        """
+        from model.qc_metadata_model import DeviceMetadata
+        
+        # SpinQ NMR típicamente tiene 2 qubits (según la documentación)
+        device_metadata = DeviceMetadata(
+            device_id=device_name,
+            provider="SpinQ",
+            technology="nmr",  # Nuclear Magnetic Resonance
+            backend_name=device_name,
+            num_qubits=2,  # Límite físico según documentación
+            version="1.0",
+            timestamp_metadata=datetime.datetime.utcnow().isoformat() + "Z",
+            connectivity={"topology_type": "all_to_all"},  # NMR típicamente permite todas las conexiones
+            noise_characteristics={},  # NMR no expone estas métricas fácilmente
+            operational_parameters={
+                "ip": self.ip,
+                "port": self.port,
+                "compiler": "native"
+            }
+        )
+        
+        return device_metadata
+    
+    def get_calibration_data(self, device_name: str = "SpinQ-NMR") -> Any:
+        """
+        Obtiene datos de calibración para SpinQ
+        Nota: NMR no expone calibración como IBM, así que creamos datos dummy
+        
+        Args:
+            device_name: Nombre del dispositivo
+        
+        Returns:
+            CalibrationData
+        """
+        from model.qc_metadata_model import CalibrationData
+        
+        # NMR no tiene calibración expuesta, creamos datos dummy
+        calibration = CalibrationData(
+            calibration_id=f"cal_{device_name}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            device_id=device_name,
+            timestamp_captured=datetime.datetime.utcnow().isoformat() + "Z",
+            valid_until=(datetime.datetime.utcnow() + datetime.timedelta(hours=24)).isoformat() + "Z",
+            calibration_method="nmr_default",
+            calibration_version="1.0",
+            qubit_properties={
+                0: {"t1_us": None, "t2_us": None, "readout_error": None},
+                1: {"t1_us": None, "t2_us": None, "readout_error": None}
+            },
+            gate_fidelities={
+                "1q_gates": {"q0": None, "q1": None},
+                "2q_gates": {}
+            },
+            crosstalk_matrix={},
+            additional_metrics={
+                "technology": "nmr",
+                "calibration_available": False
+            }
+        )
+        
+        return calibration
+    
+    def execute_circuit(self, circuit_spinq, shots: int = 1024, task_name: str = None, **kwargs) -> Dict[str, Any]:
+        """
+        Ejecuta un circuito en SpinQ NMR
+        
+        Args:
+            circuit_spinq: Circuito de SpinQ (spinqit.Circuit)
+            shots: Número de shots
+            task_name: Nombre de la tarea (opcional)
+            **kwargs: Argumentos adicionales
+        
+        Returns:
+            Diccionario con resultados
+        """
+        try:
+            from spinqit import NMRConfig
+            
+            # Compilar el circuito
+            exe = self.compiler.compile(circuit_spinq, 0)
+            
+            # Configurar conexión
+            config = NMRConfig()
+            config.configure_shots(shots)
+            config.configure_ip(self.ip)
+            config.configure_port(self.port)
+            
+            if self.username and self.password:
+                config.configure_account(self.username, self.password)
+            
+            if task_name:
+                config.configure_task(task_name, task_name)
+            else:
+                task_name = f"task_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                config.configure_task(task_name, task_name)
+            
+            # Ejecutar
+            result = self.engine.execute(exe, config)
+            
+            # Convertir probabilidades a counts
+            counts = {}
+            if hasattr(result, 'probabilities'):
+                probs = result.probabilities
+                # probs es un diccionario o array, convertir a counts
+                if isinstance(probs, dict):
+                    for state, prob in probs.items():
+                        counts[str(state)] = int(prob * shots)
+                elif isinstance(probs, (list, tuple)):
+                    # Si es array, asumir orden binario (00, 01, 10, 11)
+                    num_qubits = circuit_spinq.num_qubits if hasattr(circuit_spinq, 'num_qubits') else 2
+                    for i, prob in enumerate(probs):
+                        state_str = format(i, f'0{num_qubits}b')
+                        counts[state_str] = int(prob * shots)
+            
+            return {
+                "counts": counts,
+                "shots": shots,
+                "success": True,
+                "job_id": task_name,
+                "backend_name": "SpinQ-NMR",
+                "probabilities": result.probabilities if hasattr(result, 'probabilities') else None
+            }
+            
+        except Exception as e:
+            raise Exception(f"Error al ejecutar circuito en SpinQ: {e}")
+
+
+# ============================================================
 # FUNCIONES DE UTILIDAD
 # ============================================================
 

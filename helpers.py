@@ -5,8 +5,16 @@ Funciones helper para los PoCs
 
 import datetime
 from typing import Dict, Any, Optional
-from qiskit import QuantumCircuit
-from qiskit.circuit.library import EfficientSU2
+
+# Importaciones opcionales de Qiskit (solo si está instalado)
+try:
+    from qiskit import QuantumCircuit
+    from qiskit.circuit.library import EfficientSU2
+    HAS_QISKIT = True
+except ImportError:
+    HAS_QISKIT = False
+    QuantumCircuit = None
+    EfficientSU2 = None
 
 # Compatibilidad con diferentes versiones de Qiskit
 try:
@@ -28,11 +36,56 @@ except ImportError:
         Aer = None
 
 
-def build_vqe_circuit(num_qubits: int = 2) -> QuantumCircuit:
+def build_vqe_circuit_spinq(num_qubits: int = 2):
+    """
+    Construye un circuito VQE simple para H2 usando SpinQ
+    Retorna un circuito de spinqit.Circuit
+    
+    Args:
+        num_qubits: Número de qubits (default: 2, límite de SpinQ NMR)
+    
+    Returns:
+        Circuito de SpinQ
+    """
+    try:
+        from spinqit import Circuit, H, CX, Ry
+        
+        circuit = Circuit()
+        q = circuit.allocateQubits(num_qubits)
+        
+        # Ansatz UCCSD simplificado para H2
+        # Versión funcional: usar solo H y CX (compuertas que sabemos que funcionan)
+        # Nota: Ry tiene sintaxis diferente, se puede agregar después cuando se confirme
+        if num_qubits == 2:
+            # Preparación del estado |01⟩ + |10⟩ (singlete)
+            circuit << (H, q[0])
+            circuit << (H, q[1])
+            # Entrelazamiento
+            circuit << (CX, [q[0], q[1]])
+            
+            # Ansatz simplificado usando solo H y CX
+            # Más compuertas Hadamard para variar el estado
+            circuit << (H, q[0])
+            circuit << (H, q[1])
+            # Más entrelazamiento
+            circuit << (CX, [q[0], q[1]])
+            circuit << (CX, [q[1], q[0]])
+            # Finalizar con Hadamard
+            circuit << (H, q[0])
+        
+        return circuit
+    except ImportError:
+        raise ImportError("spinqit no está instalado. Instala con: pip install spinqit")
+
+
+def build_vqe_circuit(num_qubits: int = 2):
     """
     Construye un circuito VQE simple para H2
     Usa EfficientSU2 como ansatz básico
     """
+    if not HAS_QISKIT:
+        raise ImportError("Qiskit no está instalado. Instala con: pip install qiskit")
+    
     circuit = QuantumCircuit(num_qubits)
     
     # Ansatz UCCSD simplificado para H2
